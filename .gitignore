@@ -20,6 +20,9 @@ models/
 # AI 工具内部文件
 .claude/
 
+# 个人需求草稿(不入库)
+/需求
+
 # OS
 .DS_Store
 Thumbs.db
