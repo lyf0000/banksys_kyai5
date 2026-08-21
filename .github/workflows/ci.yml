@@ -27,6 +27,9 @@ jobs:
       - name: Unit tests with coverage
         run: pytest
 
-      # 模型快速门禁(train.py --quick --assert-auc 0.60)随 US-4 训练模块接入
+      # 模型快速门禁:子样本训练 + AUC 断言(US-4)
+      - name: Model quick gate
+        run: python scripts/train.py --quick --assert-auc 0.60
+
       - name: Build image
         run: docker build -t banksys_kyai5:ci .

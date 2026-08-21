@@ -71,8 +71,8 @@
 以便 训练与页面共用同一数据口径,并尽早暴露脏数据。
 
 验收标准:
-- AC1: Given `data/train.csv`,When 调用加载函数,Then 返回 21 列 DataFrame 且 `subscribe` 取值只含 yes/no。
-- AC2: Given `data/test.csv`,When 调用加载函数,Then 返回 20 列(无 `subscribe`)。
+- AC1: Given `data/train.csv`,When 调用加载函数,Then 返回 22 列 DataFrame(id + 20 特征 + `subscribe`)且 `subscribe` 取值只含 yes/no。
+- AC2: Given `data/test.csv`,When 调用加载函数,Then 返回 21 列(id + 20 特征,无 `subscribe`)。
 - AC3: Given 数据文件缺失或列名不符,When 调用加载函数,Then 抛出含明确信息的异常,不做静默降级。
 - AC4: Given 合法数据,When 校验函数运行,Then 输出行数、各列类型;类别列中的 `unknown` 视为合法取值。
 

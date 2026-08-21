@@ -11,8 +11,8 @@
 
 | 文件 | 规模 | 说明 |
 |---|---|---|
-| `data/train.csv` | 22,500 行 × 21 列 | 含目标列 `subscribe`(yes/no) |
-| `data/test.csv` | 7,500 行 × 20 列 | 无目标列,留作演示/扩展 |
+| `data/train.csv` | 22,500 行 × 22 列 | id + 20 特征 + 目标列 `subscribe`(yes/no) |
+| `data/test.csv` | 7,500 行 × 21 列 | id + 20 特征,无目标列,留作演示/扩展 |
 
 公开脱敏教学数据(类 UCI Bank Marketing),进 Git 以保证 CI/CD 可复现。
 
