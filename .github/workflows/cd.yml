@@ -3,6 +3,7 @@ name: CD
 on:
   push:
     branches: [main]
+  workflow_dispatch: {}
 
 jobs:
   deploy:
@@ -32,7 +33,12 @@ jobs:
 
             # ssh-action 的非交互 shell PATH 很小,补全常见路径(docker 常在 /snap/bin,/usr/sbin)
             export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:$PATH"
-            command -v docker >/dev/null 2>&1 || { echo "docker 未安装或不在常见路径,请检查服务器"; exit 1; }
+            command -v docker >/dev/null 2>&1 || {
+              echo "docker 未安装或不在常见路径,服务器排查信息:"
+              echo "PATH=$PATH"
+              find / -maxdepth 4 -name "docker" -type f 2>/dev/null | head -20
+              exit 1
+            }
             docker --version
 
             cd /opt/banksys_kyai5
