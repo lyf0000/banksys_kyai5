@@ -10,8 +10,10 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir --timeout 120 -i "${PIP_INDEX_URL}" -r requirements.txt
 
-# US-4 接入后,此处追加离线训练步骤(训练完整模型并断言 AUC),使镜像自带模型
 COPY . .
+
+# 构建时训练完整模型并断言 AUC(US-4):AUC 不达标则构建失败,镜像自带模型
+RUN python scripts/train.py --assert-auc 0.60
 
 EXPOSE 8888
 

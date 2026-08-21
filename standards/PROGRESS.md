@@ -6,7 +6,7 @@
 
 ## 当前状态(对应 06 六步流程)
 
-**第⑤步 —— PR #4 已合并,CD 第二次失败(服务器无 docker),fix/5 分支已备好(待网络恢复后推送)。**
+**第⑥步 完成 —— 完整 CI/CD 链路首次跑通:部署成功,主机端口 8888,健康检查 ok。下一步:US-2~US-6 功能开发(分支2/3/4)。**
 
 ---
 
@@ -19,7 +19,10 @@
 - 2026-08-21:PR #2 由人工合并(注意:合并时 CI 红,快照为修复前 head → main 缺 pytest pythonpath 修复,见 GOTCHAS)。
 - 2026-08-21:CD 第一次失败:`docker: command not found`(exit 127)。
 - 2026-08-21:PR #4 修复 cd.yml PATH + 带回 pythonpath 修复,CI 全绿,由人工合并。
-- 2026-08-21:CD 第二次失败:补全 PATH 后 `command -v docker` 仍找不到 → 确认服务器常见路径无 docker,需要人工在服务器安装/确认 docker。
+- 2026-08-21:CD 第二次失败:补全 PATH 后 `command -v docker` 仍找不到 → 确认服务器常见路径无 docker,需人工安装。
+- 2026-08-21:PR #7 合并:cd.yml 加 `workflow_dispatch` + docker 探测诊断(find 输出)。
+- 2026-08-21:CD 第三次失败:服务器 docker 已装(29.1.3),但 daemon 配置的镜像加速器(USTC/网易163)均已停服,拉基础镜像 DNS 失败。
+- 2026-08-21:人工换源后,CD 第四次(workflow_dispatch)成功:**部署到主机端口 8888,`/_stcore/health` 返回 ok,`http://<服务器IP>:8888`**。
 
 ---
 
@@ -29,9 +32,8 @@
 - [x] **T2 ✋确认门1**:提示人工配置 Secrets,确认后再继续
 - [x] **T3 ✋确认门2**:从最新 main 开 feature 分支,报分支名
 - [x] **T4 本地环境**:kyai5 conda 环境(py3.11)+ 依赖(清华源)
-- [x] **US-1 工程化**:PR #2 已合并(CI 红合并的教训见 GOTCHAS);PR #4 修复已合并
-- [ ] **T12 延续**:推送 `fix/5-cd-dispatch-diagnose` → PR → 人工合并 → CD 重跑 ✋确认门6
-- [ ] **服务器 docker**:人工在服务器确认/安装 docker(CD 第二次失败根因)
+- [x] **US-1 工程化**:PR #2 已合并(CI 红合并的教训见 GOTCHAS);PR #4/#7 修复已合并
+- [x] **CD 部署链路**:服务器装 docker + 换镜像加速器后,workflow_dispatch 部署成功(端口 8888,健康检查 ok)✋确认门6
 - [ ] **US-2~US-4(分支2)**:数据加载 / 预处理 / 模型训练 + `train.py --quick --assert-auc` + CI 接入模型门禁
 - [ ] **US-5(分支3)**:数据分析页
 - [ ] **US-6(分支4)**:在线预测页
@@ -52,3 +54,4 @@
 - **CD `docker: command not found`(exit 127)**(2026-08-21):appleboy/ssh-action 非交互 shell 的 PATH 很小。修复:cd.yml 部署脚本开头补全 PATH 并加存在性检查。**但补全后仍找不到 → 服务器本身无 docker 或装在非标准位置,需人工在服务器确认**(第二次 CD 失败,2026-08-21)。
 - **CI 红时合并 PR**(2026-08-21):PR #2 在 CI 红时被合并,且合并快照为修复前 head,导致 main 缺修复。提醒:合并前必须确认 PR checks 全绿(分支保护可强制,可选开启)。
 - **github.com 网络抖动**(2026-08-21):git fetch/push 偶发 Connection reset / 443 超时,重试或稍等恢复;期间可离线切分支、写代码,恢复后 rebase 推送。
+- **服务器 docker 镜像加速器失效**(2026-08-21):daemon.json 里 USTC(`docker.mirrors.ustc.edu.cn`)与网易(`hub-mirror.c.163.com`)均停服,拉镜像报 `no such host`。修复:换可用源(如 `docker.1ms.run` / `docker.m.daocloud.io`)后 `systemctl restart docker`。判断是否命中:报错域名出现在 docker pull 的 Head 请求里。
