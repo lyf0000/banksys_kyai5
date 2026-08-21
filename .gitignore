@@ -17,6 +17,9 @@ models/
 .idea/
 .vscode/
 
+# AI 工具内部文件
+.claude/
+
 # OS
 .DS_Store
 Thumbs.db
