@@ -44,6 +44,10 @@ jobs:
             cd /opt/banksys_kyai5
             docker build --build-arg PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple -t banksys_kyai5:latest .
 
+            # 先幂等替换自身旧容器(释放它占用的端口),再探测空闲端口;
+            # 否则旧容器占着 8888 会导致每次都回退到 8889
+            docker rm -f banksys_kyai5 2>/dev/null || true
+
             # 容器内端口固定 8888;主机端口 8888 优先,占用则在 8888-8898 回退
             port_in_use() {
               ss -ltnH 2>/dev/null | grep -q ":$1 " && return 0
@@ -57,8 +61,6 @@ jobs:
             [ -z "$PORT" ] && { echo "预留端口区间已全部占用,部署中止"; exit 1; }
             echo ">> 部署到主机端口 $PORT"
 
-            # 幂等替换自身旧容器,不删除占用端口的他人容器
-            docker rm -f banksys_kyai5 2>/dev/null || true
             docker run -d --name banksys_kyai5 --restart unless-stopped -p ${PORT}:8888 banksys_kyai5:latest
 
             # Streamlit 启动需要数秒,轮询健康检查最多 40s
