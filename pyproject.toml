@@ -7,4 +7,6 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# CI 上直接跑 pytest 时项目根不在 sys.path,导致 import banksys 失败
+pythonpath = ["."]
 addopts = "--cov=banksys --cov-fail-under=80 --cov-report=term-missing"

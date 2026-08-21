@@ -29,6 +29,12 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
+
+            # ssh-action 的非交互 shell PATH 很小,补全常见路径(docker 常在 /snap/bin,/usr/sbin)
+            export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:$PATH"
+            command -v docker >/dev/null 2>&1 || { echo "docker 未安装或不在常见路径,请检查服务器"; exit 1; }
+            docker --version
+
             cd /opt/banksys_kyai5
             docker build --build-arg PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple -t banksys_kyai5:latest .
 
