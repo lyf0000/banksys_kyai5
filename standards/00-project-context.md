@@ -36,19 +36,20 @@
 banksys_kyai5/
 ├── standards/                 # AI 项目记忆与通用规范
 ├── data/                      # train.csv / test.csv(公开脱敏教学数据,进 Git)
-├── src/banksys/               # 核心包:data.py 加载校验 / preprocess.py 编码 / model.py 训练推理
+├── banksys/                   # 核心包:data.py 加载校验 / preprocess.py 编码 / model.py 训练推理(US-2~US-4 起逐步落位)
 ├── scripts/
-│   └── train.py               # 离线训练入口(--quick 快速门禁 / --assert-auc 阈值断言)
-├── app.py                     # Streamlit 入口 = 数据分析页
+│   └── train.py               # 离线训练入口(--quick 快速门禁 / --assert-auc 阈值断言,US-4 落位)
+├── app.py                     # Streamlit 入口 = 数据分析页(US-5 落位)
 ├── pages/
-│   └── 1_prediction.py        # 在线预测页(点选表单)
-├── models/                    # 训练产物(不进 Git;Docker build 时生成)
+│   └── 1_prediction.py        # 在线预测页(点选表单,US-6 落位)
+├── models/                    # 训练产物(不进 Git;Docker build 时生成,US-4 落位)
 ├── tests/                     # pytest 单元测试 + AppTest 页面冒烟测试
 ├── requirements.txt           # 生产运行依赖
 ├── requirements-dev.txt       # 本地/CI 检查依赖(pytest/ruff/coverage)
-├── Dockerfile                 # 构建时执行完整训练 + AUC 断言
+├── pyproject.toml             # ruff 与 pytest 配置
+├── Dockerfile                 # 构建时执行完整训练 + AUC 断言(US-4 接入)
 ├── .github/workflows/
-│   ├── ci.yml                 # PR:ruff / pytest+覆盖率 / 模型快速门禁 / docker build
+│   ├── ci.yml                 # PR:ruff / pytest+覆盖率 / 模型快速门禁(US-4 接入)/ docker build
 │   └── cd.yml                 # main:SSH 部署 + 健康检查
 ├── .gitignore
 └── README.md
@@ -62,8 +63,8 @@ banksys_kyai5/
 |---|---|
 | 格式检查 | `ruff format --check .` |
 | 静态检查 | `ruff check .` |
-| 单元测试 | `pytest --cov=src --cov-fail-under=80`(核心包 src/ 覆盖率 ≥ 80%;页面用 AppTest 冒烟) |
-| 覆盖率 | ≥ 80%(src/ 包) |
+| 单元测试 | `pytest --cov=banksys --cov-fail-under=80`(核心包 banksys/ 覆盖率 ≥ 80%;页面用 AppTest 冒烟) |
+| 覆盖率 | ≥ 80%(banksys/ 包) |
 | 构建 | `docker build`(CI/CD 执行,本地不强制) |
 | 模型指标门禁 | 本地/CI:`python scripts/train.py --quick --assert-auc 0.60`;完整数据训练 + 同断言在 Docker build 内执行,不达标构建失败 |
 | 健康检查 | `curl -fsS http://localhost:<PORT>/_stcore/health` 返回 `ok` |

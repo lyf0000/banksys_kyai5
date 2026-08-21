@@ -6,20 +6,23 @@
 
 ## 当前状态(对应 06 六步流程)
 
-**第①步之前 —— 文档初始化完成,等待人工确认后建仓。**
+**第②步 —— 分支已开,✋确认门2:等待确认后进入模块开发。**
 
 ---
 
 ## 已完成
 
 - 2026-08-21:初始化 `standards/00-project-context.md`、`01-requirements.md`、本文件;已读数据确认结构(train 22,500 行含 `subscribe`;test 7,500 行无标签)。
+- 2026-08-21:T1 建仓完成。开源仓库 https://github.com/lyf0000/banksys_kyai5 ;main 仅引导提交 `cbdf5f8`(.gitignore + 占位 README + standards/);`data/` 与「需求」草稿留待 feature 分支提交。
+- 2026-08-21:T2 确认门1 通过:人工已配置 `SSH_PRIVATE_KEY` / `SSH_HOST` / `SSH_USER`(gh secret list 核对无误)。
+- 2026-08-21:T3 分支已开:创建 Issue #1(US-1 工程化),切出 `feature/1-project-init`。
 
 ---
 
 ## 下一步 TODO(第一批)
 
-- [ ] **T1 建仓**:`gh repo create banksys_kyai5 --public`,引导提交 `.gitignore` + 占位 README(不在 main 上做真实开发)
-- [ ] **T2 ✋确认门1**:提示人工配置 Secrets `SSH_PRIVATE_KEY` / `SSH_HOST` / `SSH_USER`,确认后再继续
+- [x] **T1 建仓**:`gh repo create banksys_kyai5 --public`,引导提交 `.gitignore` + 占位 README(不在 main 上做真实开发)
+- [x] **T2 ✋确认门1**:提示人工配置 Secrets `SSH_PRIVATE_KEY` / `SSH_HOST` / `SSH_USER`,确认后再继续
 - [ ] **T3 ✋确认门2**:从最新 main 开 feature 分支(如 `feature/1-project-init`),报分支名
 - [ ] **T4 本地环境**:conda 建 `python=3.11` 环境,安装 `requirements.txt` + `requirements-dev.txt`(清华源)
 - [ ] **T5 M1 数据模块**:`src/banksys/data.py` + tests(US-2)→ 汇报 ✋确认门3
