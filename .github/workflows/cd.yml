@@ -1,0 +1,59 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 覆盖式传输到服务器,不删除远端旧文件,可重复执行
+      - name: Sync code to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "."
+          target: /opt/banksys_kyai5
+          strip_components: 1
+
+      - name: Deploy container and health check
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /opt/banksys_kyai5
+            docker build --build-arg PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple -t banksys_kyai5:latest .
+
+            # 容器内端口固定 8888;主机端口 8888 优先,占用则在 8888-8898 回退
+            port_in_use() {
+              ss -ltnH 2>/dev/null | grep -q ":$1 " && return 0
+              docker ps --format "{{.Ports}}" 2>/dev/null | grep -q ":$1->" && return 0
+              return 1
+            }
+            PORT=""
+            for p in $(seq 8888 8898); do
+              if ! port_in_use "$p"; then PORT="$p"; break; fi
+            done
+            [ -z "$PORT" ] && { echo "预留端口区间已全部占用,部署中止"; exit 1; }
+            echo ">> 部署到主机端口 $PORT"
+
+            # 幂等替换自身旧容器,不删除占用端口的他人容器
+            docker rm -f banksys_kyai5 2>/dev/null || true
+            docker run -d --name banksys_kyai5 --restart unless-stopped -p ${PORT}:8888 banksys_kyai5:latest
+
+            # Streamlit 启动需要数秒,轮询健康检查最多 40s
+            ok=0
+            for i in $(seq 1 20); do
+              if curl -fsS "http://localhost:${PORT}/_stcore/health"; then ok=1; break; fi
+              sleep 2
+            done
+            [ "$ok" = "1" ] || { echo "健康检查失败"; exit 1; }
+            echo ">> 部署成功:http://${{ secrets.SSH_HOST }}:${PORT}"
